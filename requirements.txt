@@ -1,1 +1,5 @@
+# infrastructure requirements
 cryptography===38.0.3
+# development requirements
+pytest===7.1.1
+pylint===2.12.2
