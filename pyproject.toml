@@ -1,0 +1,29 @@
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.black]
+line-length = 100
+
+[tool.pylint.main]
+max-line-length = 100
+disable = [
+    "C0103", # (invalid-name)
+    "C0114", # (missing-module-docstring)
+    "C0115", # (missing-class-docstring)
+    "C0116", # (missing-function-docstring)
+    "R0903", # (too-few-public-methods)
+]
+ignore-paths = [
+    "test/*",
+    "pyproject.toml",
+    "data/*",
+    "README.md",
+    "requirements.txt",
+    "venv/*",
+]
+
+[tool.isort]
+profile = "black"
+line_length = 100
