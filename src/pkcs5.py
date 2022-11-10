@@ -1,3 +1,4 @@
+import sys
 from dataclasses import dataclass
 
 
@@ -30,3 +31,13 @@ class PKCS5:
 
     def __repr__(self) -> str:
         return self.__str__()
+
+
+def get_pkcs5(file="data/exercici.bin") -> PKCS5:
+    try:
+        pkcs5_file: PKCS5 = PKCS5.get_from_file(file)
+        print(pkcs5_file)
+        return pkcs5_file
+    except InvalidPKCS5File as ex:
+        print(f"Invalid PKCS5 file format. Error: {ex}")
+        sys.exit(-1)
