@@ -12,7 +12,7 @@ DICTIONARY = "data/cached_passwords.txt"
 
 
 def get_passwords(dictionary=DICTIONARY, separator=",") -> Generator[Tuple[str, bytes], None, None]:
-    with open(dictionary, 'r', encoding='utf-8') as file:
+    with open(dictionary, "r", encoding="utf-8") as file:
         for line in file.readlines():
             password, key = line.split(separator)
             key = key.strip()
