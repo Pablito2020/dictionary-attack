@@ -4,7 +4,7 @@ Encapsulates how all the passwords are fetched and encapsulates the logic
 behind deriving a passphrase to a key.
 """
 
-from typing import Generator
+from typing import Any, Generator
 
 from cryptography.hazmat.primitives.hashes import SHA1
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
@@ -36,3 +36,11 @@ class Password:
 
     def __repr__(self):
         return self.__str__()
+
+    def __eq__(self, other: Any) -> bool:
+        if isinstance(other, Password):
+            return self.password == other.password
+        return False
+
+    def __hash__(self) -> int:
+        return hash(self.password)
