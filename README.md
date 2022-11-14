@@ -1,4 +1,11 @@
-# Dictionary Brute Force Attack 🕮
+<h1 align="center">
+Dictionary Brute Force Attack 🕮
+</h1>
+
+## Summary
+- [Set Up](#set-up-)
+- [Run](#run-)
+- [Results](#results-)
 
 ## Set up 📦
 
