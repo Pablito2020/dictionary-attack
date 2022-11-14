@@ -28,14 +28,14 @@ This project comes with [pre-commit](https://pre-commit.com/) support to facilit
 
 ## Run 🗲
 
-### Run the brute force without caching 
-For running the brute force algorithm, execute:
+### Run the dictionary attack without caching 
+For running the dictionary attack without caching, execute:
 
 ```
-    $ python brute_force.py
+    $ python dictionary_attack.py
 ```
 
-### Run the brute force with caching
+### Run the dictionary attack with caching
 If you want to test the improvement that we could achieve if we had a dictionary with the keys already generated (so we don't need to run the hash function for calculating the key from the passphrase), follow this steps.
 
 #### Create the key cache file
@@ -48,7 +48,7 @@ Save the result of the hash function for every passphrase of the dictionary to t
 Then, run the script that uses this cached keys for decrypting the message:
 
 ```
-    $ python brute_force_cached.py
+    $ python dictionary_attack_cached.py
 ```
 
 ## Results 📉
