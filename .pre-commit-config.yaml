@@ -27,13 +27,3 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
-  - repo: local
-    hooks:
-      - id: mypy
-        name: mypy-check
-        stages: [push]
-        types: [python]
-        entry: mypy main.py
-        language: system
-        pass_filenames: false
-        always_run: true
