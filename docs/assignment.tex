@@ -1,0 +1,161 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage{graphicx} % needed for images
+\usepackage[export]{adjustbox} % needed for adjustable images
+\usepackage{flafter} % needed for figures
+\usepackage{hyperref} % needed for a clickable table of contents
+\usepackage{polyglossia} % needed for catalan support
+\usepackage{subfiles} % needed for a subfile structure
+\usepackage[table]{xcolor}
+\usepackage{fancyhdr} % needed for fancy header 
+\usepackage{subfiles} % needed for a subfile structure
+\usepackage{listings}
+\usepackage{pdflscape}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{fontspec}
+\usepackage{texlogos}
+\usepackage{csquotes}
+% Bibliography
+\usepackage[sorting=nyt]{biblatex}
+\usepackage{minted}
+\DeclareBibliographyCategory{cited}
+\AtEveryCitekey{\addtocategory{cited}{\thefield{entrykey}}}
+
+\lstset{basicstyle=\footnotesize\ttfamily}
+\lstset{framextopmargin=50pt,frame=bottomline}
+
+\usepackage{color}
+\usepackage{colortbl}
+\usepackage{lineno}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor = blue,      
+    urlcolor=blue,
+}
+
+\lstset{aboveskip=20pt,belowskip=20pt}
+
+% \setsansfont{Calibri}
+\setmonofont[Scale=0.7]{JetBrains Mono}
+
+\setmainlanguage{catalan}
+\graphicspath{ {images} }
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{Seguretat d'Aplicacions i Comunicacions}
+\fancyhead[RE,LO]{Atac de diccionari}
+\fancyfoot[LE,RO]{\thepage}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\footrulewidth}{1pt}
+
+% information
+\title{%
+    \begin{center}
+	\includegraphics[width=4cm,height=3cm]{udl.png}
+    \end{center}
+    \line(1,0){250}\\[0.3cm]
+    \textbf{Atac de diccionari} \\
+    \line(1,0){250}
+    \\[0.5cm]
+	\large Seguretat d'Aplicacions i Comunicacions - Grau en Enginyeria Informàtica
+}
+\author{Pablo Fraile Alonso}
+\date{\today}
+
+% document
+\begin{document}
+    
+% title
+\maketitle
+\thispagestyle{empty}
+\newpage
+\tableofcontents
+\listoffigures
+\newpage
+
+\section{Procediment}
+El procediment és simple, per tal de realitzar un atac de diccionari, per cada passphrase possible fem:
+\begin{enumerate}
+    \item Obtenir el salt i el missatge xifrat de l'arxiu \textit{exercici.bin}.
+    \item Amb cada possible passphrase, calcular la clau que emprarem a AES a partir de l'output de la funció PBKDF2HMAC (amb algoritme SHA1 i el salt anterior) sobre la passphrase.
+    \item Un cop calculada la clau, s'aplica el desxifratge del missatge amb l'algoritme AES (128 bits) amb mode ECB. Aquí hi han dos casos:
+        \begin{itemize}
+            \item En cas de que el missatge desxifrat \textbf{NO} es pugui decodificar en "utf-8", la donem com a invàlida, i per tant provem la següent passphrase.
+            \item En cas de que la clau pugui decodificar el missatge desxifrat en utf-8, es mostra el missatge i la passphrase corresponent a la clau.
+        \end{itemize}
+\end{enumerate}
+
+El procediment que es segueix amb els hash precomputats, és el següent:
+\begin{enumerate}
+    \item S'executa el script \textit{cache\_passwords.py} que genera un fitxer on hi han les passphrases i la seva respectiva clau\footnote{derivada amb la funció PBKDF2HMAC i el seed=salt} separades per coma.
+    \item Un cop generat el fitxer, s'executa \textit{dictionary\_attack\_cached.py}, que desxifrarà el missatge amb cada clau del fitxer. Tornen a haver-hi els mateixos dos casos a l'hora d'analitzar el missatge desxifrat:
+        \begin{itemize}
+            \item En cas de que el missatge desxifrat \textbf{NO} es pugui decodificar en "utf-8", la donem com a invàlida, i per tant provem la següent clau.
+            \item En cas de que la clau pugui decodificar el missatge desxifrat en utf-8, es mostra el missatge i la passphrase corresponent a la clau.
+        \end{itemize}
+\end{enumerate}
+
+\section{Estructura del projecte}
+L'estructura del projecte a \href{https://github.com/Pablito2020/dictionary-attack}{github} (la versió adjuntada al tar no conté els testos i altres fitxers de configuració) és la següent:
+\begin{verbatim}
+.
+├── data
+├── cache_passwords.py
+├── dictionary_attack_cached.py
+├── dictionary_attack.py
+├── docs
+├── src
+│   ├── __init__.py
+│   ├── password.py
+│   ├── pkcs5.py
+├── test
+\end{verbatim}
+On:
+\begin{itemize}
+    \item data: conté tots els arxius de dades, com ara el diccionari, l'arxiu binari de openssl amb el salt i el missatge, etc.
+    \item src: conté classes útils per al projecte:
+            \begin{itemize}
+                \item \textit{password.py}: encapsula tot el relacionat amb les passphrases i generació de claus.
+                \item \textit{pkcs5.py}: encapsula el parseig del fitxer i retorna una estructura de dades amb el missatge i el salt.
+            \end{itemize}
+    \item test: conté tests de les classes de src/
+    \item docs: conté la documentació (en format latex) i l'enunciat de la pràctica.
+    \item altres fitxers i directoris van relacionats amb la configuració de l'integració continua a github o bé configuració de programes que comproven el seguiment de bones pràctiques amb python (pylint, black, etc).
+\end{itemize}
+
+Tota l'informació necessària per a executar el projecte, es troba al fitxer \textbf{README.md}.
+
+\section{Comparació de rendiment}
+En cas de que executem l'atac \textit{"simple"} (és a dir, sense cap mena de caching amb les passphrases), veiem el següent:
+\begin{verbatim}
+[pablo@archcrypted ~/projects/dictionary] python dictionary_attack.py
+PKCS5: 
+[
+	Salt is: 10f227276c4fc533,
+	Message is: 464c08381439b4fd60377584e18e2da084b6d8ef84de2b9354f99f4df1a0eb9f
+]
+Message is: El password és Yukuo7
+Password is: Yukuo7
+Program finished in: 47.32314246299984
+\end{verbatim}
+
+En canvi, si executem l'atac amb les claus (derivades de la passphrase i el salt) ja calculades, veiem el següent resultat:
+\begin{verbatim}
+[pablo@archcrypted ~/projects/dictionary] python dictionary_attack_cached.py
+PKCS5: 
+[
+	Salt is: 10f227276c4fc533,
+	Message is: 464c08381439b4fd60377584e18e2da084b6d8ef84de2b9354f99f4df1a0eb9f
+]
+Message is: El password és Yukuo7
+Password is: Yukuo7
+Program finished in: 28.01076317000002
+\end{verbatim}
+
+Com podem veure, el fet de no haver de calcular la funció PBKDF2HMAC per cada passphrase ha decrementat en un 40\% el temps d'execució del programa (ha passat de 47 segons a 28).\\
+
+Aquest mètode de fer cache de les claus, però, no es pot realitzar en mes d'un atac, ja que el salt sempre canviarà quan tornem a xifrar un altre missatge. Per tant, tot i que en aquest cas s'hagi guanyat un 40\% de rendiment, en casos \textit{"reals"} d'atac de diccionari\footnote{Com per exemple trobar la contrasenya d'una wifi amb hashcat} és gairebé impossible emprar aquesta tècnica.
+
+\end{document}
