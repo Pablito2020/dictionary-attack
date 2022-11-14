@@ -1,3 +1,9 @@
+"""
+This file includes all the operations that we need for the pkcs5 file.
+Encapsulates how the file parsing is done, and returns a data object
+which has the salt and message in bytes
+"""
+
 import sys
 from dataclasses import dataclass
 

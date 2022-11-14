@@ -1,3 +1,9 @@
+"""
+This file includes all the operations that we need with passphrases and keys.
+Encapsulates how all the passwords are fetched and encapsulates the logic
+behind deriving a passphrase to a key.
+"""
+
 from typing import Generator
 
 from cryptography.hazmat.primitives.hashes import SHA1

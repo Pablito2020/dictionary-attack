@@ -12,6 +12,11 @@ DICTIONARY = "data/cached_passwords.txt"
 
 
 def get_passwords(dictionary=DICTIONARY, separator=",") -> Generator[Tuple[str, bytes], None, None]:
+    """'
+    returns a python generator which has a tuple of (str, bytes)
+    where the str is the passphrase and the bytes are the key derived
+    from the salt and the passphrase.
+    """
     with open(dictionary, "r", encoding="utf-8") as file:
         for line in file.readlines():
             password, key = line.split(separator)
@@ -20,14 +25,14 @@ def get_passwords(dictionary=DICTIONARY, separator=",") -> Generator[Tuple[str, 
 
 
 def print_valid_messages(pkcs5: PKCS5):
-    for password, key in get_passwords():
+    for passphrase, key in get_passwords():
         cipher = Cipher(AES128(key), ECB())
         decryptor = cipher.decryptor()
         result = decryptor.update(pkcs5.message) + decryptor.finalize()
         try:
             message = result.decode("utf-8")
             print(f"Message is: {message}")
-            print(f"Password is: {password}")
+            print(f"Password is: {passphrase}")
         except UnicodeDecodeError:
             pass
 
